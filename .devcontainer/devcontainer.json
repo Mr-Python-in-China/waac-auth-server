@@ -1,0 +1,44 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+  "name": "Ubuntu",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  "dockerComposeFile": "docker-compose.yml",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/itsmechlark/features/redis-server:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers-extra/features/corepack:1": {
+      "version": "latest"
+    }
+  },
+  "service": "app",
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // "features": {},
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    10699,
+    6379,
+    3306
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Prisma.prisma",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "donjayamanne.githistory"
+      ]
+    }
+  },
+  "containerEnv": {
+    "DATABASE_URL": "mysql://root:password@localhost:3306/waac_auth_server",
+    "REDIS_URL": "redis://localhost:6379"
+  },
+  "postCreateCommand": "npx prisma migrate deploy"
+  // Configure tool-specific properties.
+  // "customizations": {},
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+}
