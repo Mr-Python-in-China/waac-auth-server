@@ -1,4 +1,16 @@
 import { ThemeProvider, BaseStyles } from "@primer/react";
+import "@primer/primitives/dist/css/functional/themes/light.css";
+import "@primer/primitives/dist/css/functional/themes/dark.css";
+import "@primer/primitives/dist/css/base/size/size.css";
+import "@primer/primitives/dist/css/base/typography/typography.css";
+import "@primer/primitives/dist/css/functional/size/border.css";
+import "@primer/primitives/dist/css/functional/size/breakpoints.css";
+import "@primer/primitives/dist/css/functional/size/size-coarse.css";
+import "@primer/primitives/dist/css/functional/size/size-fine.css";
+import "@primer/primitives/dist/css/functional/size/size.css";
+import "@primer/primitives/dist/css/functional/size/viewport.css";
+import "@primer/primitives/dist/css/functional/typography/typography.css";
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-cn">
