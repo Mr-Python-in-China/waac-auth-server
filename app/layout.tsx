@@ -15,9 +15,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-cn">
       <body>
-        <ThemeProvider>
-          <BaseStyles>{children}</BaseStyles>
-        </ThemeProvider>
+        <div id="app">
+          <ThemeProvider>
+            <BaseStyles>{children}</BaseStyles>
+          </ThemeProvider>
+        </div>
       </body>
     </html>
   );
