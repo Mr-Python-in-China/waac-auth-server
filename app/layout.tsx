@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-cn">
       <body>
-        <div id="app">
+        <div id="app" style={{ fontSize: "var(--text-body-size-medium)" }}>
           <ThemeProvider>
             <BaseStyles>{children}</BaseStyles>
           </ThemeProvider>

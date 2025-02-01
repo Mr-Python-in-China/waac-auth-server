@@ -2,6 +2,7 @@ import { randomBytes } from "crypto";
 import prisma from ".";
 import { saltPassowrd, sleep } from "@/utils/utils";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+
 export async function dbCreateUser(
   name: string,
   lguid: number,
@@ -39,4 +40,17 @@ export async function dbCreateUser(
     }
     throw e;
   }
+}
+
+export async function validateUserLogin(username: string, password: string) {
+  const user = await prisma.user.findUnique({
+    where: /^\d+$/.test(username)
+      ? { id: parseInt(username, 10) }
+      : { name: username },
+    select: { id: true, salt: true, password: true },
+  });
+  if (!user) return "UserNotFound";
+  const saltedPassword = saltPassowrd(password, Buffer.from(user.salt));
+  if (saltedPassword.equals(user.password)) return user.id;
+  return "PasswordIncorrect";
 }

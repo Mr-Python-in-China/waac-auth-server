@@ -18,26 +18,25 @@ import {
 } from "@/utils/validate";
 import registerUser from "./registerUser";
 import { Banner } from "@primer/react/experimental";
-import { sleep } from "@/utils/utils";
 import { useRouter } from "next/navigation";
+import {
+  checkUserExistsByLguid,
+  checkUserExistsByUsername,
+} from "../checkUserExits";
 
 export default function RegisterForm() {
   const router = useRouter();
-  const [session, setSession] = useState<string | false | undefined>(undefined);
-  const [inputLguid, setInputLguid] = useState<string | undefined>(undefined);
-  const [inputUsername, setInputUsername] = useState<string | undefined>(
-    undefined
-  );
-  const [inputPassword, setInputPassword] = useState<string | undefined>(
-    undefined
-  );
+  const [session, setSession] = useState<string | false | undefined>();
+  const [inputLguid, setInputLguid] = useState<string | undefined>();
+  const [inputUsername, setInputUsername] = useState<string | undefined>();
+  const [inputPassword, setInputPassword] = useState<string | undefined>();
   const [inputLguidValidateMessage, setInputLguidValidateMessage] = useState<
-    string | undefined
-  >(undefined);
+    string | boolean | undefined
+  >();
   const [inputUsernameValidateMessage, setInputUsernameValidateMessage] =
-    useState<string | undefined>(undefined);
+    useState<string | boolean | undefined>();
   const [inputPasswordValidateMessage, setInputPasswordValidateMessage] =
-    useState<string | undefined>(undefined);
+    useState<string | boolean | undefined>();
   const [bannerMessage, setBannerMessage] = useState<string | undefined>();
   function updateRegisterSession() {
     return registerSession().then(
@@ -59,7 +58,6 @@ export default function RegisterForm() {
       setInputPasswordValidateMessage(inputPasswordVal);
       return;
     }
-    await sleep(1); // I wonder why `setSubmitStatus` doesn't work without this line
     try {
       const res = await registerUser(
         session,
@@ -100,6 +98,47 @@ export default function RegisterForm() {
   useEffect(() => {
     updateRegisterSession();
   }, []);
+  useEffect(() => {
+    let ignore = false;
+    if (inputLguidValidateMessage === false)
+      checkUserExistsByLguid(parseInt(inputLguid!)).then(
+        (v) => {
+          if (ignore) return;
+          setInputLguidValidateMessage(v ? "已被注册" : true);
+        },
+        (err) => {
+          if (ignore) return;
+          setInputLguidValidateMessage(undefined);
+          console.error("Error when try to check lguid exists", err);
+        }
+      );
+    if (inputUsernameValidateMessage === false)
+      checkUserExistsByUsername(inputUsername!).then(
+        (v) => {
+          if (ignore) return;
+          setInputUsernameValidateMessage(v ? "已被注册" : true);
+        },
+        (err) => {
+          if (ignore) return;
+          setInputLguidValidateMessage(undefined);
+          console.error("Error when try to check username exists", err);
+        }
+      );
+    if (inputPasswordValidateMessage === false)
+      // 为了好看
+      Promise.resolve().then(() => {
+        if (ignore) return;
+        setInputPasswordValidateMessage(true);
+      });
+    return () => void (ignore = true);
+  }, [
+    inputLguid,
+    inputUsername,
+    inputPassword,
+    inputLguidValidateMessage,
+    inputUsernameValidateMessage,
+    inputPasswordValidateMessage,
+  ]);
   return (
     <form
       action={submitAction}
@@ -123,10 +162,9 @@ export default function RegisterForm() {
         <TextInput
           name="session"
           block
-          value={
-            session === false ? "出现异常 请查看控制台" : session || "加载中……"
-          }
+          value={session === false ? "出现异常 请查看控制台" : session || ""}
           aria-invalid={!session}
+          loading={session === undefined}
           readOnly
           monospace
           {...(session === false
@@ -165,20 +203,29 @@ export default function RegisterForm() {
           name="lguid"
           block
           value={inputLguid || ""}
+          loading={inputLguidValidateMessage === false}
           onChange={(e) => {
             setInputLguid(e.target.value);
-            if (inputLguidValidateMessage)
+            if (typeof inputLguidValidateMessage === "boolean")
+              setInputLguidValidateMessage(undefined);
+            if (typeof inputLguidValidateMessage === "string")
               setInputLguidValidateMessage(validateLguid(e.target.value));
           }}
           onBlur={(e) =>
-            setInputLguidValidateMessage(validateLguid(e.target.value))
+            setInputLguidValidateMessage(validateLguid(e.target.value) || false)
           }
-          aria-invalid={!!inputLguidValidateMessage}
+          aria-invalid={typeof inputLguidValidateMessage === "string"}
         />
-        {inputLguidValidateMessage && (
-          <FormControl.Validation variant="error">
-            {inputLguidValidateMessage}
+        {inputLguidValidateMessage === true ? (
+          <FormControl.Validation variant="success">
+            未被占用
           </FormControl.Validation>
+        ) : (
+          inputLguidValidateMessage && (
+            <FormControl.Validation variant="error">
+              {inputLguidValidateMessage}
+            </FormControl.Validation>
+          )
         )}
       </FormControl>
       <FormControl required>
@@ -187,20 +234,31 @@ export default function RegisterForm() {
           name="username"
           block
           value={inputUsername || ""}
+          loading={inputUsernameValidateMessage === false}
           onChange={(e) => {
             setInputUsername(e.target.value);
-            if (inputUsernameValidateMessage)
+            if (typeof inputUsernameValidateMessage === "boolean")
+              setInputUsernameValidateMessage(undefined);
+            if (typeof inputUsernameValidateMessage === "string")
               setInputUsernameValidateMessage(validateUsername(e.target.value));
           }}
           onBlur={(e) =>
-            setInputUsernameValidateMessage(validateUsername(e.target.value))
+            setInputUsernameValidateMessage(
+              validateUsername(e.target.value) || false
+            )
           }
-          aria-invalid={!!inputUsernameValidateMessage}
+          aria-invalid={typeof inputUsernameValidateMessage === "string"}
         />
-        {inputUsernameValidateMessage && (
-          <FormControl.Validation variant="error">
-            {inputUsernameValidateMessage}
+        {inputUsernameValidateMessage === true ? (
+          <FormControl.Validation variant="success">
+            未被占用
           </FormControl.Validation>
+        ) : (
+          inputUsernameValidateMessage && (
+            <FormControl.Validation variant="error">
+              {inputUsernameValidateMessage}
+            </FormControl.Validation>
+          )
         )}
         <FormControl.Caption>
           由数字、字母、下划线构成，不得以数字开头，长度在 3 到 16 之间
@@ -212,21 +270,32 @@ export default function RegisterForm() {
           name="password"
           block
           value={inputPassword || ""}
+          loading={inputPasswordValidateMessage === false}
           type="password"
           onChange={(e) => {
             setInputPassword(e.target.value);
-            if (inputPasswordValidateMessage)
+            if (typeof inputPasswordValidateMessage === "boolean")
+              setInputPasswordValidateMessage(undefined);
+            if (typeof inputPasswordValidateMessage === "string")
               setInputPasswordValidateMessage(validatePassword(e.target.value));
           }}
           onBlur={(e) =>
-            setInputPasswordValidateMessage(validatePassword(e.target.value))
+            setInputPasswordValidateMessage(
+              validatePassword(e.target.value) || false
+            )
           }
-          aria-invalid={!!inputPasswordValidateMessage}
+          aria-invalid={typeof inputPasswordValidateMessage === "string"}
         />
-        {inputPasswordValidateMessage && (
-          <FormControl.Validation variant="error">
-            {inputPasswordValidateMessage}
+        {inputPasswordValidateMessage === true ? (
+          <FormControl.Validation variant="success">
+            密码符合要求
           </FormControl.Validation>
+        ) : (
+          inputPasswordValidateMessage && (
+            <FormControl.Validation variant="error">
+              {inputPasswordValidateMessage}
+            </FormControl.Validation>
+          )
         )}
         <FormControl.Caption>至少 6 个字符</FormControl.Caption>
       </FormControl>

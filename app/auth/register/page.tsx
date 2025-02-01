@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "注册 - WAAC auth",
 };
 
-export default function registerPage() {
+export default async function registerPage() {
   return (
     <div
       style={{
@@ -36,7 +36,7 @@ export default function registerPage() {
           border: "var(--borderWidth-thin) solid var(--borderColor-default)",
           borderRadius: "var(--borderRadius-medium)",
           display: "flex",
-          gap: "var(--base-size-8)",
+          gap: "var(--stack-gap-condensed)",
         }}
       >
         <div
