@@ -4,12 +4,12 @@ import { Button, FormControl, TextInput } from "@primer/react";
 import { useActionState, useState } from "react";
 import loginUser from "./loginUser";
 import { Banner } from "@primer/react/experimental";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
   const [inputUsername, setInputUsername] = useState<string>(
-    new URLSearchParams(window.location.search).get("username") ?? ""
+    useSearchParams()?.get("username") ?? ""
   );
   const [inputPassword, setInputPassword] = useState<string>("");
   const [bannerMessage, setBannerMessage] = useState<string | undefined>();
@@ -42,6 +42,7 @@ export default function LoginForm() {
           block
           value={inputUsername}
           onChange={(e) => setInputUsername(e.target.value)}
+          autoComplete="username"
         />
       </FormControl>
       <FormControl required>
@@ -51,6 +52,8 @@ export default function LoginForm() {
           block
           value={inputPassword}
           onChange={(e) => setInputPassword(e.target.value)}
+          type="password"
+          autoComplete="current-password"
         />
       </FormControl>
       <Button type="submit" disabled={isPending}>

@@ -1,12 +1,15 @@
 import { Link } from "@primer/react";
 import { Metadata } from "next";
 import LoginForm from "./loginForm";
+import { redirect } from "next/navigation";
+import auth from "@/utils/auth";
 
 export const metadata: Metadata = {
-  title: "注册 - WAAC auth",
+  title: "登录 - WAAC auth",
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  if ((await auth()) !== undefined) redirect("/");
   return (
     <div
       style={{

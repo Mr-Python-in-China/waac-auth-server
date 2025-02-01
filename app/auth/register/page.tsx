@@ -1,12 +1,15 @@
 import { Metadata } from "next";
 import RegisterForm from "./registerForm";
 import { Link } from "@primer/react";
+import auth from "@/utils/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "注册 - WAAC auth",
 };
 
 export default async function registerPage() {
+  if ((await auth()) !== undefined) redirect("/");
   return (
     <div
       style={{

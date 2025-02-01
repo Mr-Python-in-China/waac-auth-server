@@ -15,9 +15,6 @@ export default async function loginUser(username: string, password: string) {
       httpOnly: true,
       maxAge: 10 * 24 * 60 * 60, // 10 days
     });
-    cookie.set("uid", res.toString(), {
-      maxAge: 10 * 24 * 60 * 60, // 10 days
-    });
   } catch (e) {
     logger.error("Unknown error in app/auth/login/loginUser.ts", e);
     return "UnknownError";

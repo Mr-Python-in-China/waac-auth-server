@@ -10,7 +10,8 @@ export async function createUserSession(uid: number) {
 }
 
 export async function validateUserSession(session: string) {
+  const v = await redis.expire("userSession:" + session, 10 * 24 * 60 * 60); // 10 days
   const s = await redis.get("userSession:" + session);
-  if (s === null) return undefined;
+  if (!v || s === null) return undefined;
   return parseInt(s);
 }

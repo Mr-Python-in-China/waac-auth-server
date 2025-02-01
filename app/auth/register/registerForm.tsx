@@ -248,6 +248,7 @@ export default function RegisterForm() {
             )
           }
           aria-invalid={typeof inputUsernameValidateMessage === "string"}
+          autoComplete="username"
         />
         {inputUsernameValidateMessage === true ? (
           <FormControl.Validation variant="success">
@@ -285,6 +286,7 @@ export default function RegisterForm() {
             )
           }
           aria-invalid={typeof inputPasswordValidateMessage === "string"}
+          autoComplete="new-password"
         />
         {inputPasswordValidateMessage === true ? (
           <FormControl.Validation variant="success">
