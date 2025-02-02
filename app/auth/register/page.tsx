@@ -19,7 +19,15 @@ export default async function registerPage() {
     >
       <h1 style={{ textAlign: "center" }}>注册</h1>
       <p style={{ color: "var(--fgColor-muted)" }}>
-        请准备一个已经<b>通过实名认证的洛谷账户</b>，将以下内容填写至
+        请准备一个已经
+        <b>
+          通过实名认证的
+          <Link href="https://www.luogu.com.cn/" target="_blank">
+            洛谷
+          </Link>
+          账户
+        </b>
+        ，将以下内容填写至
         <b>个人签名</b>处，然后接着完善以下信息。该 session 10 分钟内有效。
       </p>
       <div

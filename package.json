@@ -10,10 +10,9 @@
   },
   "dependencies": {
     "@primer/react": "^37.11.0",
-    "@prisma/client": "^6.2.1",
+    "@prisma/client": "^6.3.0",
     "axios": "^1.7.9",
     "next": "15.1.6",
-    "prisma": "^6.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "redis": "^4.7.0",
@@ -27,6 +26,7 @@
     "@types/react-dom": "^18.3.5",
     "eslint": "^9.19.0",
     "eslint-config-next": "15.1.6",
+    "prisma": "^6.3.0",
     "typescript": "^5.7.3"
   }
 }

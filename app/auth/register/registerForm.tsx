@@ -195,6 +195,7 @@ export default function RegisterForm() {
               />
             </ButtonGroup>
           }
+          style={{ textOverflow: "ellipsis", cursor: "pointer" }}
         />
       </FormControl>
       <FormControl required>

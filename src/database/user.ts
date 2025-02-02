@@ -1,20 +1,20 @@
 import { randomBytes } from "crypto";
 import prisma from ".";
-import { saltPassowrd, sleep } from "@/utils/utils";
+import { saltPassowrd } from "@/utils/utils";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { randomUnsignedUUID } from "@/utils/random";
 
 export async function dbCreateUser(
   name: string,
   lguid: number,
-  password: string,
-  retry = 0
-): Promise<{ id: number; username: string }> {
+  password: string
+) {
   const salt = randomBytes(16);
   const saltedPssword = saltPassowrd(password, salt);
   try {
     const res = await prisma.user.create({
       data: {
-        id: await prisma.user.count(),
+        id: randomUnsignedUUID(),
         name,
         lguid,
         password: saltedPssword,
@@ -28,12 +28,7 @@ export async function dbCreateUser(
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
       const target = e.meta?.target as string[] | undefined;
-      if (target?.includes("id")) {
-        if (retry <= 3)
-          return await sleep(200).then(() =>
-            dbCreateUser(name, lguid, password, retry + 1)
-          );
-      } else if (target?.includes("name"))
+      if (target?.includes("name"))
         throw new Error("UsernameExists", { cause: e });
       else if (target?.includes("lguid"))
         throw new Error("LguidExists", { cause: e });
@@ -44,13 +39,11 @@ export async function dbCreateUser(
 
 export async function validateUserLogin(username: string, password: string) {
   const user = await prisma.user.findUnique({
-    where: /^\d+$/.test(username)
-      ? { id: parseInt(username, 10) }
-      : { name: username },
+    where: { name: username },
     select: { id: true, salt: true, password: true },
   });
   if (!user) return "UserNotFound";
   const saltedPassword = saltPassowrd(password, Buffer.from(user.salt));
-  if (saltedPassword.equals(user.password)) return user.id;
+  if (saltedPassword.equals(user.password)) return { id: user.id };
   return "PasswordIncorrect";
 }
