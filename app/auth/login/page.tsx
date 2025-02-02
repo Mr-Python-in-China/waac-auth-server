@@ -11,12 +11,7 @@ export const metadata: Metadata = {
 export default async function LoginPage() {
   if ((await auth()) !== undefined) redirect("/");
   return (
-    <div
-      style={{
-        width: "288px",
-        margin: "0 auto",
-      }}
-    >
+    <>
       <h1 style={{ textAlign: "center" }}>登录</h1>
       <div
         style={{
@@ -48,6 +43,6 @@ export default async function LoginPage() {
           还没有账号？<Link href="/auth/register">注册</Link>
         </div>
       </div>
-    </div>
+    </>
   );
 }

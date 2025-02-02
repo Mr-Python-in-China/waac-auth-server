@@ -11,12 +11,7 @@ export const metadata: Metadata = {
 export default async function registerPage() {
   if ((await auth()) !== undefined) redirect("/");
   return (
-    <div
-      style={{
-        width: "288px",
-        margin: "0 auto",
-      }}
-    >
+    <>
       <h1 style={{ textAlign: "center" }}>注册</h1>
       <p style={{ color: "var(--fgColor-muted)" }}>
         请准备一个已经
@@ -60,6 +55,6 @@ export default async function registerPage() {
           已有账号？<Link href="/auth/login">登录</Link>
         </div>
       </div>
-    </div>
+    </>
   );
 }
