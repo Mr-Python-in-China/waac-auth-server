@@ -19,6 +19,19 @@ export async function listProfiles(uid: string) {
   });
 }
 
+export async function listProfileSummary(uid: string) {
+  return await prisma.profile.findMany({
+    where: {
+      ownerId: uid,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+    orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+  });
+}
+
 export async function createProfile(name: string, ownerId: string) {
   const steveHash = await createSteveTexture();
   try {

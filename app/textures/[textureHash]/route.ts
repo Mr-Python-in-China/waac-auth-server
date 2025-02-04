@@ -9,8 +9,12 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ textureHash: string }> }
 ) {
+  if ((await params).textureHash.length !== 64)
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
   try {
-    const texture = await getTexture((await params).textureHash);
+    const texture = await getTexture(
+      Uint8Array.from(Buffer.from((await params).textureHash, "hex"))
+    );
     if (texture === undefined) {
       return NextResponse.json(
         {

@@ -26,7 +26,8 @@
     "server-only": "^0.0.1",
     "skinview3d": "^3.1.0",
     "styled-components": "^5.3.11",
-    "winston": "^3.17.0"
+    "winston": "^3.17.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
