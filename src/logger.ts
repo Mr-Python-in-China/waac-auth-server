@@ -7,10 +7,10 @@ class DebugTransport extends Transport {
     (info.level === "error"
       ? console.error
       : info.level === "warn"
-      ? console.warn
-      : info.level === "info"
-      ? console.info
-      : console.debug)(info);
+        ? console.warn
+        : info.level === "info"
+          ? console.info
+          : console.debug)(info);
     next(null, true);
   }
 }
