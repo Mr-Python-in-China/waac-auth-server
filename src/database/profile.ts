@@ -55,3 +55,16 @@ export async function createProfile(name: string, ownerId: string) {
     throw e;
   }
 }
+
+export async function getProfileOwner(name: string) {
+  return (
+    await prisma.profile.findUnique({
+      where: {
+        name,
+      },
+      select: {
+        owner: true,
+      },
+    })
+  )?.owner.name;
+}

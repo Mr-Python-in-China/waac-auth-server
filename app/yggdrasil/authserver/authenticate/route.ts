@@ -1,4 +1,4 @@
-import { listProfileSummary } from "@/database/profile";
+import { getProfileOwner, listProfileSummary } from "@/database/profile";
 import { validateUserLogin } from "@/database/user";
 import {
   addUserLoginFailedCount,
@@ -25,7 +25,23 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
   if ("$error" in data)
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   return (async () => {
-    if (await checkUserLoginBannedState(data.username))
+    let username: string;
+    let selectedProfileName: string | undefined;
+    if (data.username[0] === "%") {
+      selectedProfileName = data.username.slice(1).toLowerCase();
+      const owner = await getProfileOwner(selectedProfileName);
+      if (owner === undefined)
+        return NextResponse.json(
+          {
+            error: "ForbiddenOperationException",
+            errorMessage:
+              "Invalid credentials. Invalid credentials. Invalid username or password.",
+          },
+          { status: 403 }
+        );
+      username = owner;
+    } else username = data.username;
+    if (await checkUserLoginBannedState(username))
       return NextResponse.json(
         {
           error: "ForbiddenOperationException",
@@ -33,10 +49,9 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
         },
         { status: 403 }
       );
-    const res = await validateUserLogin(data.username, data.password);
+    const res = await validateUserLogin(username, data.password);
     if (typeof res === "string") {
-      if (res === "PasswordIncorrect")
-        await addUserLoginFailedCount(data.username);
+      if (res === "PasswordIncorrect") await addUserLoginFailedCount(username);
       if (res === "UserNotFound" || res === "PasswordIncorrect")
         return NextResponse.json(
           {
@@ -47,7 +62,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
         );
       res satisfies never;
     }
-    await resetUserLoginFailedCount(data.username);
+    await resetUserLoginFailedCount(username);
     const profiles = await listProfileSummary(res.id);
     return NextResponse.json({
       accessToken: await createYggdrasilSession(res.id, res.name),
@@ -60,7 +75,11 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
           }
         : undefined,
       availableProfiles: profiles,
-      selectedProfile: profiles.length === 1 ? profiles[0] : undefined,
+      selectedProfile: selectedProfileName
+        ? profiles.find((x) => x.name.toLowerCase() === selectedProfileName)
+        : profiles.length === 1
+          ? profiles[0]
+          : undefined,
     });
   })().catch((e) => {
     console.error(
