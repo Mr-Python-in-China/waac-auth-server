@@ -8,10 +8,32 @@ datasource db {
 }
 
 model User {
+  id        String    @id @unique @db.Char(32)
+  name      String    @unique @db.VarChar(16)
+  lguid     Int       @unique @db.UnsignedInt
+  password  Bytes     @db.Binary(32)
+  salt      Bytes     @db.Binary(32)
+  profile   Profile[]
+  profileId String?   @db.Char(32)
+  createdAt DateTime  @default(now())
+}
+
+model Profile {
   id        String   @id @unique @db.Char(32)
+  owner     User     @relation(fields: [ownerId], references: [id])
+  ownerId   String
   name      String   @unique @db.VarChar(16)
-  lguid     Int      @unique @db.UnsignedInt
-  password  Bytes    @db.Binary(32)
-  salt      Bytes    @db.Binary(32)
+  model     Boolean  @default(false) // false-default, true-slim
+  skin      Texture  @relation(name: "skin", fields: [skinId], references: [hash])
+  skinId    Bytes    @db.Binary(32)
+  cape      Texture? @relation(name: "cape", fields: [capeId], references: [hash])
+  capeId    Bytes?   @db.Binary(32)
   createdAt DateTime @default(now())
+}
+
+model Texture {
+  hash          Bytes     @id @unique @db.Binary(32)
+  data          Bytes     @db.Blob
+  ProfileBySkin Profile[] @relation(name: "skin")
+  ProfileByCape Profile[] @relation(name: "cape")
 }

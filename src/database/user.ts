@@ -40,10 +40,11 @@ export async function dbCreateUser(
 export async function validateUserLogin(username: string, password: string) {
   const user = await prisma.user.findUnique({
     where: { name: username },
-    select: { id: true, salt: true, password: true },
+    select: { id: true, name: true, salt: true, password: true },
   });
   if (!user) return "UserNotFound";
-  const saltedPassword = saltPassowrd(password, Buffer.from(user.salt));
-  if (saltedPassword.equals(user.password)) return { id: user.id };
+  const saltedPassword = saltPassowrd(password, user.salt);
+  if (Buffer.compare(saltedPassword, user.password) === 0)
+    return { id: user.id, name: user.name };
   return "PasswordIncorrect";
 }

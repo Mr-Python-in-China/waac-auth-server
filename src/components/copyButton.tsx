@@ -1,6 +1,8 @@
 import { IconButton } from "@primer/react";
-import { CheckIcon, CopyIcon } from "@primer/octicons-react";
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCopy } from "@fortawesome/free-solid-svg-icons";
 
 export function CopyButton({ onCopy }: { onCopy: () => Promise<boolean> }) {
   const [flag, setFlag] = useState<NodeJS.Timeout | undefined>(undefined);
@@ -8,7 +10,11 @@ export function CopyButton({ onCopy }: { onCopy: () => Promise<boolean> }) {
     <IconButton
       variant="invisible"
       aria-labelledby="复制"
-      icon={flag ? CheckIcon : CopyIcon}
+      icon={
+        flag
+          ? () => <FontAwesomeIcon icon={faCheck} style={{ height: "16px" }} />
+          : () => <FontAwesomeIcon icon={faCopy} style={{ height: "16px" }} />
+      }
       style={flag && { color: "var(--fgColor-accent)" }}
       onClick={async () => {
         if (!(await onCopy())) return;

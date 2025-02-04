@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import RegisterForm from "./registerForm";
-import { Link } from "@primer/react";
+import Link from "@/components/link";
 import auth from "@/utils/auth";
 import { redirect } from "next/navigation";
 
@@ -17,7 +17,11 @@ export default async function registerPage() {
         请准备一个已经
         <b>
           通过实名认证的
-          <Link href="https://www.luogu.com.cn/" target="_blank">
+          <Link
+            href="https://www.luogu.com.cn/"
+            target="_blank"
+            rel="noopener noreferrer external"
+          >
             洛谷
           </Link>
           账户

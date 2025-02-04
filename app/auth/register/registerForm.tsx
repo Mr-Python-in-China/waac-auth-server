@@ -9,8 +9,7 @@ import {
   IconButton,
   TextInput,
 } from "@primer/react";
-import { SyncIcon } from "@primer/octicons-react";
-import { CopyButton } from "@/components";
+import { CopyButton } from "@/components/copyButton";
 import {
   validateLguid,
   validatePassword,
@@ -23,6 +22,8 @@ import {
   checkUserExistsByLguid,
   checkUserExistsByUsername,
 } from "../checkUserExits";
+import { faRotateRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -86,6 +87,7 @@ export default function RegisterForm() {
         setBannerMessage("个人签名与 session 不匹配，请仔细检查。");
         return;
       }
+      if (typeof res === "string") res satisfies never;
       setBannerMessage(undefined);
       router.push("/auth/login?username=" + res.username);
       return;
@@ -187,7 +189,12 @@ export default function RegisterForm() {
               <IconButton
                 variant="invisible"
                 aria-labelledby="刷新"
-                icon={SyncIcon}
+                icon={() => (
+                  <FontAwesomeIcon
+                    icon={faRotateRight}
+                    style={{ height: "16px" }}
+                  />
+                )}
                 onClick={() => {
                   setSession(undefined);
                   updateRegisterSession();
@@ -302,7 +309,7 @@ export default function RegisterForm() {
         )}
         <FormControl.Caption>至少 6 个字符</FormControl.Caption>
       </FormControl>
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} variant="primary">
         注册
       </Button>
     </form>

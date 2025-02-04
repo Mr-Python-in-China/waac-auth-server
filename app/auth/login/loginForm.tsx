@@ -20,6 +20,7 @@ export default function LoginForm() {
       if (res === "PasswordIncorrect") setBannerMessage("密码不正确。");
       else if (res === "UnknownError") throw new Error("Unknown server error.");
       else if (res === "UserNotFound") setBannerMessage("该用户不存在。");
+      else if (typeof res === "string") res satisfies never;
       else router.push("/");
     } catch (e) {
       setBannerMessage("未知错误，请查看控制台。");
@@ -56,7 +57,7 @@ export default function LoginForm() {
           autoComplete="current-password"
         />
       </FormControl>
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} variant="primary">
         登录
       </Button>
       {bannerMessage && (

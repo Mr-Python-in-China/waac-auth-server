@@ -1,4 +1,4 @@
-import { Link } from "@primer/react";
+import Link from "@/components/link";
 import { Metadata } from "next";
 import LoginForm from "./loginForm";
 import { redirect } from "next/navigation";

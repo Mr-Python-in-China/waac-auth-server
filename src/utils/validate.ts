@@ -13,3 +13,4 @@ export function validateLguid(s: string | undefined) {
   if (!s) return "不得为空";
   if (s && !/^[1-9][0-9]{0,8}$/.test(s)) return "值不合法";
 }
+export const validateProfilename = validateUsername;

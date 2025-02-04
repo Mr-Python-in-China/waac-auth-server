@@ -9,7 +9,7 @@ export default async function loginUser(username: string, password: string) {
   try {
     const res = await validateUserLogin(username, password);
     if (typeof res === "string") return res;
-    const session = await createUserSession(res.id);
+    const session = await createUserSession(res.id,res.name);
     const cookie = await cookies();
     cookie.set("session", session, {
       httpOnly: true,
