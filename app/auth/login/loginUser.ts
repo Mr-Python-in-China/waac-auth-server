@@ -2,13 +2,25 @@
 
 import { validateUserLogin } from "@/database/user";
 import logger from "@/logger";
+import {
+  addUserLoginFailedCount,
+  checkUserLoginBannedState,
+  resetUserLoginFailedCount,
+} from "@/redis/userLoginFailedCount";
 import { createUserSession } from "@/redis/userSession";
 import { cookies } from "next/headers";
 
 export default async function loginUser(username: string, password: string) {
   try {
+    if (typeof username !== "string" || typeof password !== "string")
+      throw new TypeError("InvalidParams");
+    if (await checkUserLoginBannedState(username)) return "FailedTooManyTimes";
     const res = await validateUserLogin(username, password);
-    if (typeof res === "string") return res;
+    if (typeof res === "string") {
+      if (res === "PasswordIncorrect") await addUserLoginFailedCount(username);
+      return res;
+    }
+    await resetUserLoginFailedCount(username);
     const session = await createUserSession(res.id, res.name);
     const cookie = await cookies();
     cookie.set("session", session, {

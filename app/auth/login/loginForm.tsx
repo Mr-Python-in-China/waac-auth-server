@@ -17,9 +17,14 @@ export default function LoginForm() {
     setBannerMessage(undefined);
     try {
       const res = await loginUser(inputUsername, inputPassword);
-      if (res === "PasswordIncorrect") setBannerMessage("密码不正确。");
-      else if (res === "UnknownError") throw new Error("Unknown server error.");
+      if (res === "PasswordIncorrect") {
+        setBannerMessage("密码不正确。");
+        setInputPassword("");
+      } else if (res === "UnknownError")
+        throw new Error("Unknown server error.");
       else if (res === "UserNotFound") setBannerMessage("该用户不存在。");
+      else if (res === "FailedTooManyTimes")
+        setBannerMessage("密码错误次数过多，请 5 分钟后再试。");
       else if (typeof res === "string") res satisfies never;
       else router.push("/");
     } catch (e) {

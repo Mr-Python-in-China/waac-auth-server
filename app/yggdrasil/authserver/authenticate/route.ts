@@ -1,5 +1,10 @@
 import { listProfileSummary } from "@/database/profile";
 import { validateUserLogin } from "@/database/user";
+import {
+  addUserLoginFailedCount,
+  checkUserLoginBannedState,
+  resetUserLoginFailedCount,
+} from "@/redis/userLoginFailedCount";
 import { createYggdrasilSession } from "@/redis/yggdrasilSession";
 import { safeCallAsync } from "@/utils/safeCall";
 import { randomBytes } from "crypto";
@@ -20,8 +25,18 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
   if ("$error" in data)
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   return (async () => {
+    if (await checkUserLoginBannedState(data.username))
+      return NextResponse.json(
+        {
+          error: "ForbiddenOperationException",
+          errorMessage: "Invalid credentials.",
+        },
+        { status: 403 }
+      );
     const res = await validateUserLogin(data.username, data.password);
     if (typeof res === "string") {
+      if (res === "PasswordIncorrect")
+        await addUserLoginFailedCount(data.username);
       if (res === "UserNotFound" || res === "PasswordIncorrect")
         return NextResponse.json(
           {
@@ -32,6 +47,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
         );
       res satisfies never;
     }
+    await resetUserLoginFailedCount(data.username);
     const profiles = await listProfileSummary(res.id);
     return NextResponse.json({
       accessToken: await createYggdrasilSession(res.id, res.name),
