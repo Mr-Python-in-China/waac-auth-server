@@ -11,8 +11,6 @@ services:
       - MYSQL_DATABASE=waac_auth_server
       - MYSQL_USER=user
       - MYSQL_PASSWORD=password
-    ports:
-      - "3306:3306"
 
   app:
     build:
@@ -21,6 +19,8 @@ services:
     volumes:
       - ..:/workspace:cached
     command: sleep infinity
+    depends_on:
+      - db
     network_mode: service:db
 
 volumes:
