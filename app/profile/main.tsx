@@ -2,60 +2,51 @@
 
 import styled from "styled-components";
 import { useAuthLogined } from "../../src/components/authContext";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { listProfiles } from "./listProfiles";
 import { Banner, Blankslate } from "@primer/react/experimental";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faUsers } from "@fortawesome/free-solid-svg-icons";
-import { Button, FormControl, TextInput } from "@primer/react";
+import { Button } from "@primer/react";
 import { validateProfilename } from "@/utils/validate";
-import { checkProfileExits } from "./checkProfileExits";
 import createProfile from "./createProfile";
 import SkinView3D from "@/components/skinView3d";
-import { toBase64 } from "@/utils/base64";
+import { toBase64 } from "@/utils/uint8ArrayUtils";
 import Link from "@/components/link";
+import ProfilenameInput from "@/components/profileNameInput";
+import Profile from "./profileClass";
 
-export interface Profile {
-  name: string;
-  id: string;
-  createdAt: Date;
-  skin: {
-    data: Uint8Array;
-    hash: Uint8Array;
-  };
-  cape: {
-    data: Uint8Array;
-    hash: Uint8Array;
-  } | null;
-}
-
-const Card = styled.div`
+const CardNoHover = styled.div`
   background-color: var(--card-bgColor);
   box-shadow: var(--shadow-resting-small);
-  border: var(--borderWidth-thin, 1px) solid var(--borderColor-default);
+  border: var(--borderWidth-thin) solid var(--borderColor-default);
   border-radius: var(--borderRadius-medium);
   width: 300px;
   height: 400px;
-`;
-const CardProfileLink = styled(Link)`
-  display: flex;
-  gap: var(--base-size-8);
-  flex-direction: column;
-  color: var(--fgColor-default);
-  padding: var(--base-size-8);
-  transition: background 0.12s ease-out;
-  text-decoration: none;
-  border: none;
   background-color: transparent;
+  text-decoration: none;
+  padding: 0;
+`;
+const Card = styled(CardNoHover)`
+  transition: background 0.12s ease-out;
   &:hover {
     background: var(--control-transparent-bgColor-hover);
     cursor: pointer;
   }
 `;
+
+const CardProfileInfo = styled.div`
+  display: flex;
+  gap: var(--base-size-8);
+  flex-direction: column;
+  color: var(--fgColor-default);
+  padding: var(--base-size-8);
+`;
 const CardGrid = styled.div`
   display: grid;
   grid-gap: var(--base-size-16);
   grid-template-columns: repeat(auto-fit, 300px);
+  justify-content: center;
 `;
 
 export default function Main({
@@ -80,9 +71,12 @@ export default function Main({
   return (
     <div
       style={{
-        marginLeft: "var(--base-size-16)",
-        marginRight: "var(--base-size-16)",
-        marginTop: "var(--base-size-16)",
+        paddingLeft: "var(--base-size-16)",
+        paddingRight: "var(--base-size-16)",
+        paddingTop: "var(--base-size-16)",
+        marginLeft: "auto",
+        marginRight: "auto",
+        maxWidth: "1280px",
       }}
     >
       {profiles === undefined ? undefined : typeof profiles === "string" ? (
@@ -170,6 +164,7 @@ function CreateProfileForm({
       return;
     }
   }, undefined);
+  useEffect(() => setInputProfileName(defaultValue), [defaultValue]);
   return (
     <form
       action={action}
@@ -201,80 +196,12 @@ function CreateProfileForm({
   );
 }
 
-function ProfilenameInput({
-  value: inputProfilename,
-  setValue: setInputProfilename,
-  validateMessage,
-  setValidateMessage,
-}: {
-  value: string | undefined;
-  setValue: (s: string | undefined) => void;
-  validateMessage: string | boolean | undefined;
-  setValidateMessage: (s: string | boolean | undefined) => void;
-}) {
-  useEffect(() => {
-    let ignore = false;
-    if (validateMessage === false)
-      checkProfileExits(inputProfilename!).then((v) => {
-        if (ignore) return;
-        setValidateMessage(v ? "已被注册" : true);
-      });
-    return () => void (ignore = true);
-  });
-  return (
-    <FormControl>
-      <FormControl.Label>角色名</FormControl.Label>
-      <TextInput
-        block
-        value={inputProfilename || ""}
-        onChange={(e) => {
-          setInputProfilename(e.target.value);
-          if (typeof validateMessage === "boolean")
-            setValidateMessage(undefined);
-          if (typeof validateMessage === "string")
-            setValidateMessage(validateProfilename(e.target.value));
-        }}
-        onBlur={(e) =>
-          setValidateMessage(validateProfilename(e.target.value) || false)
-        }
-        loading={validateMessage === false}
-        aria-invalid={typeof validateMessage === "string"}
-      />
-      {validateMessage === true ? (
-        <FormControl.Validation variant="success">
-          未被占用
-        </FormControl.Validation>
-      ) : (
-        validateMessage && (
-          <FormControl.Validation variant="error">
-            {validateMessage}
-          </FormControl.Validation>
-        )
-      )}
-      <FormControl.Caption>
-        由数字、字母、下划线构成，不得以数字开头，长度在 3 到 16 之间
-      </FormControl.Caption>
-    </FormControl>
-  );
-}
-
 function ProfileCard({ profile }: { profile: Profile }) {
   return (
-    <Card>
-      <SkinView3D
-        height={300 * 1.1}
-        width={298}
-        skinUrl={"data:image/png;base64," + toBase64(profile.skin.data)}
-        capeUrl={
-          profile.cape
-            ? "data:image/png;base64," + toBase64(profile.cape.data)
-            : undefined
-        }
-        name={profile.name}
-        backgroundColor="var(--bgColor-muted)"
-        key={profile.skin.hash + ";" + (profile.cape?.hash || undefined)}
-      />
-      <CardProfileLink href={"/profile/" + profile.id}>
+    // @ts-ignore Why error?
+    <Card as={Link} href={"/profile/" + profile.id}>
+      <ViewProfileSkin profile={profile} />
+      <CardProfileInfo>
         <div
           style={{
             fontWeight: "bold",
@@ -284,52 +211,79 @@ function ProfileCard({ profile }: { profile: Profile }) {
           {profile.name}
         </div>
         <div style={{ color: "var(--fgColor-muted)" }}>
-          Created at: {profile.createdAt.toLocaleString()}
+          创建于 {profile.createdAt.toLocaleString()}
         </div>
-      </CardProfileLink>
+      </CardProfileInfo>
     </Card>
   );
 }
 function CreateProfileCard({ onSuccess }: { onSuccess: () => void }) {
   const [showState, setShowState] = useState(false);
-  return (
-    <Card>
-      {showState ? (
-        <div
-          style={{
-            display: "flex",
-            height: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            marginLeft: "var(--base-size-16)",
-            marginRight: "var(--base-size-16)",
-          }}
-        >
-          <CreateProfileForm
-            onSuccess={() => {
-              setShowState(false);
-              onSuccess();
-            }}
-          />
-        </div>
-      ) : (
-        <CardProfileLink
-          as="button"
-          onClick={() => setShowState(true)}
-          style={{
-            width: "100%",
-            height: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "var(--base-size-12)",
-          }}
-        >
-          <FontAwesomeIcon icon={faPlus} size="4x" />
-          <div style={{ fontSize: "var(--text-title-size-medium)" }}>
-            创建角色
-          </div>
-        </CardProfileLink>
-      )}
+  return showState ? (
+    <CardNoHover
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        paddingLeft: "var(--base-size-16)",
+        paddingRight: "var(--base-size-16)",
+      }}
+    >
+      <CreateProfileForm
+        onSuccess={() => {
+          setShowState(false);
+          onSuccess();
+        }}
+      />
+    </CardNoHover>
+  ) : (
+    <Card
+      as="button"
+      onClick={() => setShowState(true)}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "var(--base-size-12)",
+      }}
+    >
+      <FontAwesomeIcon icon={faPlus} size="4x" />
+      <div style={{ fontSize: "var(--text-title-size-medium)" }}>创建角色</div>
     </Card>
+  );
+}
+
+function ViewProfileSkin({ profile }: { profile: Profile }) {
+  const viewerRef = useRef<import("skinview3d").SkinViewer>(null);
+  useEffect(() => {
+    if (viewerRef.current === null) {
+      console.warn(
+        "Unexpected behavior in component ViewProfileSkin: viewerRef.current is null."
+      );
+      return;
+    }
+    console.log(viewerRef.current);
+    viewerRef.current.camera.position.set(35, 20, 35);
+  }, []);
+  return (
+    <div style={{ width: "298px", height: "330px" }}>
+      <SkinView3D
+        height={330}
+        width={298}
+        skinUrl={"data:image/png;base64," + toBase64(profile.skin.data)}
+        capeUrl={
+          profile.cape
+            ? "data:image/png;base64," + toBase64(profile.cape.data)
+            : undefined
+        }
+        name={profile.name}
+        backgroundColor="var(--bgColor-muted)"
+        disableControls
+        model={profile.model}
+        ref={viewerRef}
+        key={profile.skin.hash + ";" + (profile.cape?.hash || undefined)}
+      />
+    </div>
   );
 }

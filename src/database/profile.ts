@@ -1,6 +1,5 @@
 import { randomUnsignedUUID } from "@/utils/random";
 import prisma from ".";
-import { createSteveTexture } from "./texture";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function listProfiles(uid: string) {
@@ -11,6 +10,7 @@ export async function listProfiles(uid: string) {
     select: {
       id: true,
       name: true,
+      model: true,
       skin: true,
       cape: true,
       createdAt: true,
@@ -32,15 +32,18 @@ export async function listProfileSummary(uid: string) {
   });
 }
 
-export async function createProfile(name: string, ownerId: string) {
-  const steveHash = await createSteveTexture();
+export async function createProfile(
+  name: string,
+  ownerId: string,
+  defaultSkinId: Uint8Array
+) {
   try {
     return (
       await prisma.profile.create({
         data: {
           id: randomUnsignedUUID(),
           name,
-          skinId: steveHash,
+          skinId: defaultSkinId,
           ownerId,
         },
         select: { id: true },
@@ -67,4 +70,124 @@ export async function getProfileOwner(name: string) {
       },
     })
   )?.owner.name;
+}
+
+export async function getProfile(id: string) {
+  return await prisma.profile.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skinId: true,
+      capeId: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function getProfileWithTexture(id: string) {
+  return await prisma.profile.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skin: true,
+      cape: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function setProfileName(id: string, newName: string) {
+  try {
+    return await prisma.profile.update({
+      where: { id },
+      data: { name: newName },
+      select: {
+        id: true,
+        name: true,
+        model: true,
+        skin: true,
+        cape: true,
+        createdAt: true,
+      },
+    });
+  } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError && e.code === "P2002") {
+      const target = e.meta?.target as string[] | undefined;
+      if (target?.includes("name"))
+        throw new Error("ProfileNameExists", { cause: e });
+    }
+    throw e;
+  }
+}
+export async function setProfileModel(id: string, model: boolean) {
+  return await prisma.profile.update({
+    where: { id },
+    data: { model },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skin: true,
+      cape: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function setProfileSkinTexture(id: string, texture: Uint8Array) {
+  return await prisma.profile.update({
+    where: { id },
+    data: { skinId: texture },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skin: true,
+      cape: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function setProfileCapeTexture(id: string, texture: Uint8Array) {
+  return await prisma.profile.update({
+    where: { id },
+    data: { capeId: texture },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skin: true,
+      cape: true,
+      createdAt: true,
+    },
+  });
+}
+export async function deleteProfileCapeTexture(id: string) {
+  return await prisma.profile.update({
+    where: { id },
+    data: { capeId: null },
+    select: {
+      id: true,
+      name: true,
+      model: true,
+      skin: true,
+      cape: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function deleteProfile(id: string) {
+  await prisma.profile.delete({
+    where: { id },
+  });
 }

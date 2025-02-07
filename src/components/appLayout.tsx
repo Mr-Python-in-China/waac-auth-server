@@ -59,7 +59,7 @@ export function AppLayout({
           padding: "var(--base-size-12) var(--base-size-16)",
           gap: "var(--base-size-12)",
           fontSize: "var(--text-body-size-large)",
-          borderBottom: "1px solid var(--borderColor-default)",
+          borderBottom: "var(--borderWidth-thin) solid var(--borderColor-default)",
         }}
       >
         <nav style={{ flex: 1 }}>

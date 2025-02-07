@@ -23,7 +23,7 @@ model Profile {
   owner     User     @relation(fields: [ownerId], references: [id])
   ownerId   String
   name      String   @unique @db.VarChar(16)
-  model     Boolean  @default(false) // false-default, true-slim
+  model     Boolean  @default(false) // false: default / Steve; true: slim / Alex;
   skin      Texture  @relation(name: "skin", fields: [skinId], references: [hash])
   skinId    Bytes    @db.Binary(32)
   cape      Texture? @relation(name: "cape", fields: [capeId], references: [hash])
