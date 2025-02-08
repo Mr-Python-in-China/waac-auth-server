@@ -25,12 +25,13 @@
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
         "donjayamanne.githistory",
-        "styled-components.vscode-styled-components"
+        "styled-components.vscode-styled-components",
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
   "containerEnv": {
-    "DATABASE_URL": "mysql://root:password@localhost:3306/waac_auth_server",
+    "DATABASE_URL": "mysql://user:password@localhost:3306/waac_auth_server",
     "REDIS_URL": "redis://localhost:6379",
     "DOMAIN": "localhost",
     "BASE_URL": "http://localhost:10699"

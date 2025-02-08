@@ -1,0 +1,39 @@
+name: "Waac Auth Server"
+
+services:
+  db:
+    image: mariadb:11.7.1-ubi9-rc
+    restart: always
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=waac_auth_server
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+
+  redis:
+    image: redis:7.4
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+  app:
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile
+    restart: always
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "10699:10699"
+    environment:
+      - DATABASE_URL=mysql://user:password@db:3306/waac_auth_server
+      - REDIS_URL=redis://redis:6379
+      - DOMAIN=${DOMAIN}
+      - BASE_URL=${BASE_URL:-}
+
+volumes:
+  mariadb-data:
+  redis-data:
