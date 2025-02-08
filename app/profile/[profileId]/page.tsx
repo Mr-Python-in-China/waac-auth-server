@@ -2,6 +2,8 @@ import { AppLayout } from "@/components/appLayout";
 import { Metadata } from "next";
 import Main from "./main";
 import profileData from "./profileData";
+import auth from "@/utils/auth";
+import { redirect } from "next/navigation";
 
 export async function generateMetadata({
   params,
@@ -22,7 +24,9 @@ export default async function ProfileInfoPage({
 }) {
   const { profileId } = await params;
   const profile = await profileData(profileId);
-
+  const uid = (await auth())?.uid;
+  if (uid === undefined) redirect("/auth/login");
+  if (uid !== profile.ownerId) redirect("/profile");
   return (
     <AppLayout tab="角色">
       <Main initialProfile={profile} />

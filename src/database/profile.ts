@@ -131,6 +131,7 @@ export async function getProfileWithTexture(id: string) {
       skin: true,
       cape: true,
       createdAt: true,
+      ownerId: true,
     },
   });
 }
