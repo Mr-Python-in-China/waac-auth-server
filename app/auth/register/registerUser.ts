@@ -21,7 +21,7 @@ export default async function registerUser(
   try {
     if (!validateRegisterSession(session)) return "UnknownSession";
     const fetchRes = (
-      await axios.get(`https://www.luogu.com/user/${lguid}?_contentOnly`, {
+      await axios.get(`https://www.luogu.com.cn/user/${lguid}?_contentOnly`, {
         timeout: 3000,
         headers: {
           "User-Agent": "WAAC Auth Server",
