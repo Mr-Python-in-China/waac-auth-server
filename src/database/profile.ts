@@ -93,6 +93,24 @@ export async function getProfile(id: string) {
     select: {
       id: true,
       name: true,
+      ownerId: true,
+      model: true,
+      skinId: true,
+      capeId: true,
+      createdAt: true,
+    },
+  });
+}
+
+export async function getProfileByName(name: string) {
+  return await prisma.profile.findUnique({
+    where: {
+      name,
+    },
+    select: {
+      id: true,
+      name: true,
+      ownerId: true,
       model: true,
       skinId: true,
       capeId: true,
@@ -202,5 +220,44 @@ export async function deleteProfileCapeTexture(id: string) {
 export async function deleteProfile(id: string) {
   await prisma.profile.delete({
     where: { id },
+  });
+}
+
+export async function getProfileSummaryByName(name: string) {
+  return await prisma.profile.findUnique({
+    where: {
+      name,
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+export async function listManyProfileSummaryByNames(names: string[]) {
+  return await prisma.profile.findMany({
+    where: {
+      name: {
+        in: names,
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+}
+
+export async function getProfileSummaryWithOwnerId(id: string) {
+  return await prisma.profile.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      id: true,
+      name: true,
+      ownerId: true,
+    },
   });
 }

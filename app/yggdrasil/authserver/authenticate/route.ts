@@ -1,5 +1,6 @@
 import { getProfileOwnerByName, listProfileSummary } from "@/database/profile";
 import { validateUserLogin } from "@/database/user";
+import logger from "@/logger";
 import {
   addUserLoginFailedCount,
   checkUserLoginBannedState,
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
           : undefined,
     });
   })().catch((e) => {
-    console.error(
+    logger.error(
       "Unknown error in app/yggdrasil/authserver/authenticate/route.ts POST",
       e
     );

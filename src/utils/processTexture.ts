@@ -1,6 +1,6 @@
 import sharp from "sharp";
 
-export async function processSkinTexture(data: Uint8Array) {
+export async function processSkinTexture(data: Uint8Array | ArrayBuffer) {
   try {
     const image = sharp(data, {
       limitInputPixels: 1e7,
