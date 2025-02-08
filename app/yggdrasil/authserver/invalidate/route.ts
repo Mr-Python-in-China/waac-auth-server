@@ -1,7 +1,5 @@
 import logger from "@/logger";
-import {
-  deleteYggdrasilSession,
-} from "@/redis/yggdrasilSession";
+import { deleteYggdrasilSession } from "@/redis/yggdrasilSession";
 import { safeCallAsync } from "@/utils/safeCall";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";

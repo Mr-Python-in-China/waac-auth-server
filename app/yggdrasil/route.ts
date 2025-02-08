@@ -1,14 +1,14 @@
 import { BASE_URL, DOMAIN } from "@/constants";
 import { NextResponse } from "next/server";
 import { publicKey } from "@/signatureKey";
-import { version as serverVersion } from "@/../package.json";
+import PackageMeta from "@/../package.json";
 
 export function GET(): NextResponse {
   return NextResponse.json({
     meta: {
       serverName: "WAAC",
       implementationName: "WAAC Auth",
-      implementationVersion: serverVersion,
+      implementationVersion: PackageMeta.version,
       links: {
         homepage: BASE_URL + "/",
         register: BASE_URL + "/auth/register",

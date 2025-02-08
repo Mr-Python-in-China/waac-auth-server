@@ -1,8 +1,6 @@
 import { getProfileSummaryWithOwnerId } from "@/database/profile";
 import logger from "@/logger";
-import {
-  createJoinServerRecord
-} from "@/redis/serverJoinedRecord";
+import { createJoinServerRecord } from "@/redis/serverJoinedRecord";
 import { validateYggdrasilSession } from "@/redis/yggdrasilSession";
 import { safeCallAsync } from "@/utils/safeCall";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,10 +25,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
     if (!user || profileSummary?.ownerId !== user.uid)
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    await createJoinServerRecord(
-      profileSummary.name,
-      data.serverId
-    );
+    await createJoinServerRecord(profileSummary.name, data.serverId);
     return new NextResponse(null, { status: 204 });
   })().catch((e) => {
     logger.error(

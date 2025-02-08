@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   title: "角色列表 - WAAC auth",
 };
 
-
 export default async function ProfilePage() {
   const user = await auth();
   if (user === undefined) redirectToLogin();

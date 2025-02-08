@@ -5,8 +5,8 @@ const ignoredTrailingSlashRedirectPaths = [/^\/yggdrasil/];
 export default function middlware(req: NextRequest) {
   // Redirect to the same path without a trailing slash
   const { pathname } = req.nextUrl;
-  console.debug(pathname);
   if (
+    pathname !== "/" &&
     pathname.endsWith("/") &&
     !ignoredTrailingSlashRedirectPaths.some((re) => re.test(pathname))
   ) {
