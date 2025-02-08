@@ -52,8 +52,10 @@ export function EditNameDialog({
         return;
       }
       if (res === "UnknownError") throw new Error("Unknown server error.");
-      if (typeof res === "string") res satisfies never;
-      onSuccess(res);
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
+      else if (typeof res === "string") res satisfies never;
+      else onSuccess(res);
     } catch (e) {
       setBannerMessage("未知错误，请查看控制台。");
       console.error("Error when submit edit name form:", e);
@@ -117,8 +119,10 @@ export function EditModelDialog({
     try {
       const res = await setProfileModel(profileId, inputProfileModel!);
       if (res === "UnknownError") throw new Error("Unknown server error.");
-      if (typeof res === "string") res satisfies never;
-      onSuccess(res);
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
+      else if (typeof res === "string") res satisfies never;
+      else onSuccess(res);
     } catch (e) {
       setBannerMessage("未知错误，请查看控制台。");
       console.error("Error when submit edit model form:", e);
@@ -200,6 +204,8 @@ export function UploadSkinDialog({
       if (res === "InvalidSize") setBannerMessage("图片尺寸不合法。");
       else if (res === "InvaildImage") setBannerMessage("无法处理该图片。");
       else if (res === "UnknownError") throw new Error("Unknown server error.");
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
       else if (typeof res === "string") res satisfies never;
       else onSuccess(res);
     } catch (e) {
@@ -268,6 +274,8 @@ export function UploadCapeDialog({
       if (res === "InvalidSize") setBannerMessage("图片尺寸不合法。");
       else if (res === "InvaildImage") setBannerMessage("无法处理该图片。");
       else if (res === "UnknownError") throw new Error("Unknown server error.");
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
       else if (typeof res === "string") res satisfies never;
       else onSuccess(res);
     } catch (e) {
@@ -325,8 +333,10 @@ export function DeleteCapeDialog({
     try {
       const res = await deleteProfileCapeTexture(profileId);
       if (res === "UnknownError") throw new Error("Unknown server error.");
-      if (typeof res === "string") res satisfies never;
-      onSuccess(res);
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
+      else if (typeof res === "string") res satisfies never;
+      else onSuccess(res);
     } catch (e) {
       setBannerMessage("未知错误，请查看控制台。");
       console.error("Error when delete cape:", e);
@@ -386,6 +396,8 @@ export function DeleteProfileDialog({
     try {
       const res = await deleteProfile(profileId);
       if (res === "UnknownError") throw new Error("Unknown server error.");
+      else if (res === "NoAccess")
+        setBannerMessage("无权操作。重新登录后重试。");
       else res satisfies never;
     } catch (e) {
       setBannerMessage("未知错误，请查看控制台。");

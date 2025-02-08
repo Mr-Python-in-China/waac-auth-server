@@ -59,17 +59,30 @@ export async function createProfile(
   }
 }
 
-export async function getProfileOwner(name: string) {
+export async function getProfileOwner(id: string) {
+  return (
+    await prisma.profile.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        owner: { select: { id: true, name: true } },
+      },
+    })
+  )?.owner;
+}
+
+export async function getProfileOwnerByName(name: string) {
   return (
     await prisma.profile.findUnique({
       where: {
         name,
       },
       select: {
-        owner: true,
+        owner: { select: { id: true, name: true } },
       },
     })
-  )?.owner.name;
+  )?.owner;
 }
 
 export async function getProfile(id: string) {

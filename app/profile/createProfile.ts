@@ -7,9 +7,9 @@ import logger from "@/logger";
 import { createSteveTexture as createSteveTextureDB } from "@/database/texture";
 
 export default async function createProfile(name: string) {
-  const user = await auth();
-  if (user === undefined) redirectToLogin();
   try {
+    const user = await auth();
+    if (user === undefined) redirectToLogin();
     return {
       id: await createSteveTextureDB().then((textureId) =>
         createProfileDB(name, user.uid, textureId)

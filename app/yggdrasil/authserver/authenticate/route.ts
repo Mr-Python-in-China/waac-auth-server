@@ -1,4 +1,4 @@
-import { getProfileOwner, listProfileSummary } from "@/database/profile";
+import { getProfileOwnerByName, listProfileSummary } from "@/database/profile";
 import { validateUserLogin } from "@/database/user";
 import {
   addUserLoginFailedCount,
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
     let selectedProfileName: string | undefined;
     if (data.username[0] === "%") {
       selectedProfileName = data.username.slice(1).toLowerCase();
-      const owner = await getProfileOwner(selectedProfileName);
+      const owner = await getProfileOwnerByName(selectedProfileName);
       if (owner === undefined)
         return NextResponse.json(
           {
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest): Promise<NextResponse<unknown>> {
           },
           { status: 403 }
         );
-      username = owner;
+      username = owner.name;
     } else username = data.username;
     if (await checkUserLoginBannedState(username))
       return NextResponse.json(

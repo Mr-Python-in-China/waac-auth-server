@@ -8,14 +8,18 @@ import {
   setProfileCapeTexture as setProfileCapeTextureDB,
   deleteProfileCapeTexture as deleteProfileCapeTextureDB,
   deleteProfile as deleteProfileDB,
+  getProfileOwner,
 } from "@/database/profile";
 import { createTexture as createTextureDB } from "@/database/texture";
 import { toProfileInterface } from "../profileClass";
 import { processCapeTexture, processSkinTexture } from "@/utils/processTexture";
 import { redirect, RedirectType } from "next/navigation";
+import auth from "@/utils/auth";
 
 export async function setProfileName(id: string, newName: string) {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     return toProfileInterface(await setProfileNameDB(id, newName));
   } catch (e) {
     if (e instanceof Error) {
@@ -30,6 +34,8 @@ export async function setProfileName(id: string, newName: string) {
 }
 export async function setProfileModel(id: string, model: "default" | "slim") {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     return toProfileInterface(await setProfileModelDB(id, model === "slim"));
   } catch (e) {
     logger.error(
@@ -41,6 +47,8 @@ export async function setProfileModel(id: string, model: "default" | "slim") {
 }
 export async function setProfileSkinTexture(id: string, texture: Uint8Array) {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     const img = await processSkinTexture(texture);
     if (typeof img === "string") return img;
     const textureId = await createTextureDB(img);
@@ -55,6 +63,8 @@ export async function setProfileSkinTexture(id: string, texture: Uint8Array) {
 }
 export async function setProfileCapeTexture(id: string, texture: Uint8Array) {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     const img = await processCapeTexture(texture);
     if (typeof img === "string") return img;
     const textureId = await createTextureDB(img);
@@ -69,6 +79,8 @@ export async function setProfileCapeTexture(id: string, texture: Uint8Array) {
 }
 export async function deleteProfileCapeTexture(id: string) {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     return toProfileInterface(await deleteProfileCapeTextureDB(id));
   } catch (e) {
     logger.error(
@@ -80,6 +92,8 @@ export async function deleteProfileCapeTexture(id: string) {
 }
 export async function deleteProfile(id: string) {
   try {
+    if (((await getProfileOwner(id))?.id ?? "Who?") !== (await auth())?.uid)
+      return "NoAccess";
     await deleteProfileDB(id);
   } catch (e) {
     logger.error(
