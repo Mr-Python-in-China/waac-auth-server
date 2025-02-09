@@ -2,6 +2,7 @@ cd app/;
 if [ ! -f .initialized ]; then
   npm install && \
   npx prisma migrate deploy && \
+  prisma generate && \
   npm run build && \
   touch .initialized
   if [ ! -f .initialized ]; then
