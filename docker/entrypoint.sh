@@ -1,5 +1,12 @@
 cd app/;
-npm install && \
-npx prisma migrate deploy && \
-npm run build && \
+if [ ! -f .initialized ]; then
+  npm install && \
+  npx prisma migrate deploy && \
+  npm run build && \
+  touch .initialized
+  if [ ! -f .initialized ]; then
+    echo "Compilation failed, exiting..." >&2
+    exit 2
+  fi
+fi
 npm run start;
