@@ -11,7 +11,7 @@ export async function GET(
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   const { uuid } = await params;
   return (async () => {
-    const data = genProfileData({ id: uuid }, unsignedParam === "true");
+    const data = await genProfileData({ id: uuid }, unsignedParam === "true");
     if (!data) return new NextResponse(null, { status: 204 });
     else return NextResponse.json(data);
   })().catch((e) => {
