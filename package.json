@@ -1,6 +1,6 @@
 {
   "name": "waac-auth-server",
-  "version": "0.0.0-dev",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": {
