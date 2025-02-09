@@ -30,7 +30,6 @@ import {
   UploadSkinDialog,
 } from "./dialogs";
 import * as SkinView3dLib from "skinview3d";
-import Link from "@/components/link";
 
 const Animations = [
   [new SkinView3dLib.IdleAnimation(), faPerson],
@@ -189,7 +188,7 @@ export default function Main({ initialProfile }: { initialProfile: Profile }) {
         >
           <div style={{ display: "flex", gap: "var(--base-size-12)" }}>
             <Button
-              as={Link}
+              as="a"
               href={"/textures/" + toHex(profile.skin.hash)}
               download={profile.name + "-skin.png"}
             >
@@ -200,7 +199,7 @@ export default function Main({ initialProfile }: { initialProfile: Profile }) {
           <div style={{ display: "flex", gap: "var(--base-size-12)" }}>
             {profile.cape && (
               <Button
-                as={Link}
+                as="a"
                 href={"/textures/" + toHex(profile.cape.hash)}
                 download={profile.name + "-cape.png"}
               >
