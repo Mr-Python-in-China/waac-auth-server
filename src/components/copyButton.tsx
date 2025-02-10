@@ -1,3 +1,4 @@
+import "client-only";
 import { IconButton } from "@primer/react";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

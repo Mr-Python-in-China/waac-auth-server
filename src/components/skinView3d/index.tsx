@@ -1,50 +1,50 @@
 import "client-only";
 import "./minecraftFont.css";
+import FontFaceObserver from "fontfaceobserver";
 
 import {
   useRef,
   useEffect,
-  forwardRef,
   useImperativeHandle,
   useLayoutEffect,
+  ForwardedRef,
+  useState,
 } from "react";
 import { BackEquipment, PlayerAnimation, SkinViewer } from "skinview3d";
 
-const SkinView3D = forwardRef<
-  SkinViewer,
-  {
-    skinUrl: string;
-    capeUrl?: string;
-    width: number;
-    height: number;
-    disableControls?: boolean;
-    name?: string;
-    backgroundColor?: string;
-    model?: "slim" | "default";
-    zoom?: number;
-    animation?: PlayerAnimation;
-    paused?: boolean;
-    autoRotate?: boolean;
-    backEquipment?: BackEquipment;
-  }
->(function SkinView3D(
-  {
-    skinUrl,
-    capeUrl,
-    width,
-    height,
-    name,
-    disableControls,
-    backgroundColor,
-    model = "default",
-    zoom,
-    animation,
-    paused,
-    autoRotate,
-    backEquipment = "cape",
-  },
-  ref
-) {
+export interface SkinView3dProps {
+  skinUrl: string;
+  capeUrl?: string;
+  width: number;
+  height: number;
+  disableControls?: boolean;
+  name?: string;
+  backgroundColor?: string;
+  model?: "slim" | "default";
+  zoom?: number;
+  animation?: PlayerAnimation;
+  paused?: boolean;
+  autoRotate?: boolean;
+  backEquipment?: BackEquipment;
+  ref?: ForwardedRef<SkinViewer>;
+}
+
+function SkinView3DWithoutFontLoader({
+  skinUrl,
+  capeUrl,
+  width,
+  height,
+  name,
+  disableControls,
+  backgroundColor,
+  model = "default",
+  zoom,
+  animation,
+  paused,
+  autoRotate,
+  backEquipment = "cape",
+  ref,
+}: SkinView3dProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const viewerRef = useRef<SkinViewer | null>(null);
 
@@ -175,6 +175,37 @@ const SkinView3D = forwardRef<
   return (
     <canvas ref={canvasRef} style={{ display: "block", backgroundColor }} />
   );
-});
+}
 
-export default SkinView3D;
+function MinecraftFontLoader({
+  children,
+  unloaded,
+}: {
+  children: React.ReactNode;
+  unloaded: React.ReactNode;
+}) {
+  const [fontLoaded, setFontLoaded] = useState(false);
+  useEffect(() => {
+    const font = new FontFaceObserver("Minecraft");
+    font.load().then(() => setFontLoaded(true));
+  }, []);
+  return fontLoaded ? children : unloaded;
+}
+
+export default function SkinView3D(props: SkinView3dProps) {
+  return (
+    <MinecraftFontLoader
+      unloaded={
+        <div
+          style={{
+            width: props.width + "px",
+            height: props.height + "px",
+            backgroundColor: props.backgroundColor,
+          }}
+        />
+      }
+    >
+      <SkinView3DWithoutFontLoader {...props} />
+    </MinecraftFontLoader>
+  );
+}

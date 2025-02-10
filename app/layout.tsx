@@ -12,6 +12,7 @@ import "@primer/primitives/dist/css/functional/typography/typography.css";
 import { AuthContextProvider } from "../src/components/authContext";
 import auth from "@/utils/auth";
 import { ThemeProvider, BaseStyles } from "@primer/react";
+import StyledComponentsRegistry from "@/components/styledComponentsRegistry";
 
 export default async function Layout({
   children,
@@ -22,11 +23,13 @@ export default async function Layout({
     <html lang="zh-cn">
       <body>
         <div id="app" style={{ fontSize: "var(--text-body-size-medium)" }}>
-          <AuthContextProvider user={await auth()}>
-            <ThemeProvider>
-              <BaseStyles>{children}</BaseStyles>
-            </ThemeProvider>
-          </AuthContextProvider>
+          <StyledComponentsRegistry>
+            <AuthContextProvider user={await auth()}>
+              <ThemeProvider>
+                <BaseStyles>{children}</BaseStyles>
+              </ThemeProvider>
+            </AuthContextProvider>
+          </StyledComponentsRegistry>
         </div>
       </body>
     </html>

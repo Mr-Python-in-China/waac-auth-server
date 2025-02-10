@@ -263,7 +263,6 @@ function ViewProfileSkin({ profile }: { profile: Profile }) {
       );
       return;
     }
-    console.log(viewerRef.current);
     viewerRef.current.camera.position.set(35, 20, 35);
   }, []);
   return (
@@ -271,6 +270,7 @@ function ViewProfileSkin({ profile }: { profile: Profile }) {
       <SkinView3D
         height={330}
         width={298}
+        zoom={0.8}
         skinUrl={"data:image/png;base64," + toBase64(profile.skin.data)}
         capeUrl={
           profile.cape

@@ -16,7 +16,11 @@ class DebugTransport extends Transport {
 }
 
 const logger = winston.createLogger({
-  transports: [new DebugTransport()],
+  transports: [
+    process.env.NODE_ENV === "development"
+      ? new DebugTransport()
+      : new winston.transports.Console(),
+  ],
 });
 
 export default logger;
