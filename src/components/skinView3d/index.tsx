@@ -98,7 +98,7 @@ function SkinView3DWithoutFontLoader({
       return;
     }
     if (capeUrl) viewerRef.current.loadCape(capeUrl);
-    else viewerRef.current.loadCape(null);
+    else viewerRef.current.resetCape();
   }, [capeUrl]);
   useEffect(() => {
     if (viewerRef.current === null) {
