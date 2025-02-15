@@ -42,7 +42,7 @@ function SkinView3DWithoutFontLoader({
   animation,
   paused,
   autoRotate,
-  backEquipment = "cape",
+  backEquipment,
   ref,
 }: SkinView3dProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,6 +82,7 @@ function SkinView3DWithoutFontLoader({
     viewerRef.current.height = height;
   }, [height]);
   useEffect(() => {
+    console.debug("skin", skinUrl, viewerRef.current);
     if (viewerRef.current === null) {
       console.warn(
         "Unexpected behavior in component SkinView3D: viewerRef.current is null."
@@ -91,6 +92,7 @@ function SkinView3DWithoutFontLoader({
     viewerRef.current.loadSkin(skinUrl, { model });
   }, [skinUrl, model]);
   useEffect(() => {
+    console.debug("cape", capeUrl, viewerRef.current);
     if (viewerRef.current === null) {
       console.warn(
         "Unexpected behavior in component SkinView3D: viewerRef.current is null."
@@ -109,7 +111,6 @@ function SkinView3DWithoutFontLoader({
     }
     viewerRef.current.nameTag = name ?? null;
   }, [name]);
-
   useEffect(() => {
     if (viewerRef.current === null) {
       console.warn(
@@ -163,8 +164,9 @@ function SkinView3DWithoutFontLoader({
       );
       return;
     }
-    viewerRef.current.playerObject.backEquipment = backEquipment;
-  }, [backEquipment]);
+    viewerRef.current.playerObject.backEquipment =
+      (capeUrl && backEquipment) || null;
+  }, [backEquipment, capeUrl]);
 
   useImperativeHandle(ref, () => {
     if (viewerRef.current === null)
