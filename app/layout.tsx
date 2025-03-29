@@ -13,15 +13,23 @@ import { AuthContextProvider } from "../src/components/authContext";
 import auth from "@/utils/auth";
 import { ThemeProvider, BaseStyles } from "@primer/react";
 import StyledComponentsRegistry from "@/components/styledComponentsRegistry";
+import { MAP_URL } from "@/constants";
 
 export default async function Layout({
   children,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return (
     <html lang="zh-cn">
       <body>
+        <script
+          id="waac-auth-global"
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `window._waacAuthGlobal={navShowMap:${MAP_URL === undefined ? "false" : "true"}};`,
+          }}
+        />
         <div id="app" style={{ fontSize: "var(--text-body-size-medium)" }}>
           <StyledComponentsRegistry>
             <AuthContextProvider user={await auth()}>

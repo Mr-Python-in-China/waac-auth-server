@@ -5,7 +5,7 @@
 ```bash
 cd docker
 export DOMAIN=THE_DOMAIN_NAME
-export export BASE_URL=THE_BASE_URL
-docker-compose build
-docker-compose up
+export BASE_URL=THE_BASE_URL
+docker compose build
+docker compose up
 ```

@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 import styled from "styled-components";
 import {
   faHome,
+  faMap,
   faRightFromBracket,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
@@ -16,7 +17,8 @@ import userLogout from "../../app/auth/userLogout";
 const NavTabs = [
   ["主页", "/", faHome],
   ["角色", "/profile", faUsers],
-] as const satisfies [string, string, ...([IconDefinition] | [])][];
+  ["地图", "/map", faMap],
+] as const satisfies [string, string, IconDefinition | undefined][];
 
 const HeaderLink = styled(Link)`
   background-color: transparent;
@@ -74,17 +76,27 @@ export function AppLayout({
               margin: 0,
             }}
           >
-            {NavTabs.map(([name, href, icon]) => (
-              <li key={name}>
-                <HeaderLink
-                  href={href}
-                  aria-current={name === tab ? "page" : undefined}
-                >
-                  {icon && <FontAwesomeIcon icon={icon} />}
-                  {name}
-                </HeaderLink>
-              </li>
-            ))}
+            {NavTabs.map(([name, href, icon]) => {
+              if (
+                typeof window !== "undefined" &&
+                name === "地图" &&
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                !(window as any)._waacAuthGlobal.navShowMap
+              ) {
+                return null;
+              }
+              return (
+                <li key={name}>
+                  <HeaderLink
+                    href={href}
+                    aria-current={name === tab ? "page" : undefined}
+                  >
+                    {icon && <FontAwesomeIcon icon={icon} />}
+                    {name}
+                  </HeaderLink>
+                </li>
+              );
+            })}
           </ul>
         </nav>
         <div

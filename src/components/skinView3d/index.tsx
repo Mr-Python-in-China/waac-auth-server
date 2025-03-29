@@ -183,7 +183,7 @@ function MinecraftFontLoader({
   children,
   unloaded,
 }: {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   unloaded: React.ReactNode;
 }) {
   const [fontLoaded, setFontLoaded] = useState(false);

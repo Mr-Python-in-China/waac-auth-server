@@ -12,7 +12,7 @@ export function AuthContextProvider({
   children,
 }: {
   user: { uid: string; username: string } | undefined;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   return <authContext.Provider value={user}>{children}</authContext.Provider>;
 }
