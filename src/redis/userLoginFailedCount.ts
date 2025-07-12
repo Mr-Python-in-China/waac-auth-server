@@ -1,6 +1,6 @@
 import redis from ".";
 
-export async function addUserLoginFailedCount(name: string) {
+export async function incrementUserLoginFailedCount(name: string) {
   name = name.toLowerCase();
   const c = await redis.incrBy("userLoginFailedCount:" + name, 1);
   if (c === 5) {

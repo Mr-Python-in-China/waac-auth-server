@@ -15,7 +15,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if ("$error" in data)
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   return (async () => {
-    const info = await validateYggdrasilSession(data.accessToken);
+    const info = await validateYggdrasilSession(
+      data.accessToken,
+      data.clientToken
+    );
     if (!info)
       return NextResponse.json(
         {

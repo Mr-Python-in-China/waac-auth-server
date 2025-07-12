@@ -3,7 +3,7 @@
 import { validateUserLogin } from "@/database/user";
 import logger from "@/logger";
 import {
-  addUserLoginFailedCount,
+  incrementUserLoginFailedCount,
   checkUserLoginBannedState,
   resetUserLoginFailedCount,
 } from "@/redis/userLoginFailedCount";
@@ -17,7 +17,7 @@ export default async function loginUser(username: string, password: string) {
     if (await checkUserLoginBannedState(username)) return "FailedTooManyTimes";
     const res = await validateUserLogin(username, password);
     if (typeof res === "string") {
-      if (res === "PasswordIncorrect") await addUserLoginFailedCount(username);
+      if (res === "PasswordIncorrect") await incrementUserLoginFailedCount(username);
       return res;
     }
     await resetUserLoginFailedCount(username);

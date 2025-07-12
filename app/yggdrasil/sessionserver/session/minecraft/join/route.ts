@@ -20,11 +20,27 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   return (async () => {
     const user = await validateYggdrasilSession(data.accessToken);
-    const profileSummary = await getProfileSummaryWithOwnerId(
-      data.selectedProfile
-    );
-    if (!user || profileSummary?.ownerId !== user.uid)
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    if (
+      !user ||
+      !("profileId" in user) ||
+      data.selectedProfile !== user.profileId
+    )
+      return NextResponse.json(
+        {
+          error: "ForbiddenOperationException",
+          errorMessage: "Invalid access token or profile.",
+        },
+        { status: 403 }
+      );
+    const profileSummary = await getProfileSummaryWithOwnerId(user.profileId);
+    if (!profileSummary)
+      return NextResponse.json(
+        {
+          error: "ForbiddenOperationException",
+          errorMessage: "Invalid access token or profile.",
+        },
+        { status: 403 }
+      );
     await createJoinServerRecord(profileSummary.name, data.serverId);
     return new NextResponse(null, { status: 204 });
   })().catch((e) => {

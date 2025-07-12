@@ -28,7 +28,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   if ("$error" in data)
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
   return (async () => {
-    const info = await validateYggdrasilSession(data.accessToken);
+    const info = await validateYggdrasilSession(
+      data.accessToken,
+      data.clientToken
+    );
     if (!info)
       return NextResponse.json(
         {
@@ -37,8 +40,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         },
         { status: 403 }
       );
-    deleteYggdrasilSession(data.accessToken);
-    const newSession = await createYggdrasilSession(info.uid, info.username);
     let selectedProfile: { id: string; name: string } | undefined = undefined;
     if ("profileId" in info)
       selectedProfile = {
@@ -46,22 +47,47 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         name: info.profileName,
       };
     if (data.selectedProfile) {
+      if ("profileId" in info)
+        return NextResponse.json(
+          {
+            error: "IllegalArgumentException",
+            errorMessage:
+              "You cannot change the selected profile when you already have one.",
+          },
+          { status: 400 }
+        );
       const newProfile = await getProfile(data.selectedProfile.id);
-      if (
-        newProfile &&
-        newProfile.name === data.selectedProfile.name &&
-        newProfile.ownerId === info.uid
-      )
-        selectedProfile = data.selectedProfile;
+      if (!newProfile || newProfile.name !== data.selectedProfile.name)
+        return NextResponse.json(
+          {
+            error: "IllegalArgumentException",
+            errorMessage: "Invalid profile.",
+          },
+          { status: 400 }
+        );
+      if (newProfile.ownerId !== info.uid)
+        return NextResponse.json(
+          {
+            error: "ForbiddenOperationException",
+            errorMessage: "You do not own this profile.",
+          },
+          { status: 403 }
+        );
+      selectedProfile = data.selectedProfile;
     }
+    await deleteYggdrasilSession(data.accessToken);
+    const newSession = await createYggdrasilSession(
+      info.uid,
+      info.username,
+      info.clientToken
+    );
     if (selectedProfile) await setSelectedProfile(newSession, selectedProfile);
     return NextResponse.json({
       accessToken: newSession,
-      clientToken: data.clientToken,
+      clientToken: info.clientToken,
       selectedProfile,
       user: data.requestUser
         ? {
-            username: info.username,
             id: info.uid,
             properties: [],
           }

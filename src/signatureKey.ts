@@ -27,7 +27,7 @@ if (savedKey) {
 export { publicKey, privateKey };
 
 export function signString(message: string): string {
-  const signer = crypto.createSign("RSA-SHA256");
+  const signer = crypto.createSign("RSA-SHA1");
   signer.update(message);
   signer.end();
   return signer.sign(privateKey, "base64");

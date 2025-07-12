@@ -12,7 +12,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   );
   if ("$error" in data)
     return NextResponse.json({ error: "Bad Request" }, { status: 400 });
-  if (data.length < 1 || data.length > 10)
+  if (data.length > 10)
     return NextResponse.json(
       {
         error: "CONSTRAINT_VIOLATION",
